@@ -32,7 +32,7 @@
 >
 > ### 使用final static的变量，不需要加载整个类；
 
-![](D:\0_LeargingSummary\JVM调优\images\类加载器.png)
+![](images\类加载器.png)
 
 ```java
 //ClassLoader 
