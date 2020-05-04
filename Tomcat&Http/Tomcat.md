@@ -18,6 +18,12 @@ Cookie: Idea-fd09797b=e91c003e-3002-4648-9e7f-57edbabd1d60
 ##请求体
 ```
 
+![](images\图片1.png)
+
+# Http协议响应格式
+
+![](D:\0_LeargingSummary\Tomcat&Http\images\图片2.png)
+
 # Tomcat
 
 ![](images\tomcat整体架构图.webp)
@@ -704,4 +710,180 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
          sc.run();
      }
      ```
+
+### 处理流程
+
+见流程图tomcat请求流程
+
+对request的处理
+
+1. Http11Processor阶段
+   - parseRequestLine解析请求行
+   - parseHeaders 解析请求头
+   - prepareRequest()设置请求过滤器
+2. CoyoteAdapter阶段
+   - postParseRequest 解析并设置Catalina和指定配置
+
+## JMX
+
+JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等[植入](https://baike.baidu.com/item/植入/7958584)管理功能的框架
+
+### MBeanServer
+
+```java
+/*
+这是在代理端进行MBean操作的接口。 它包含创建，注册和删除MBean所必需的方法，以及已注册MBean的访问方法。 这是JMX基础结构的核心组件。
+
+用户代码通常不实现此接口。 而是使用{@link javax.management.MBeanServerFactory}类中的方法之一获得实现此接口的对象。
+
+添加到MBean服务器的每个MBean都变得易于管理：可以通过连接到该MBean服务器的连接器/适配器远程访问其属性和操作。 除非Java对象是符合JMX的MBean，否则无法在MBean服务器中注册。
+
+*/
+```
+
+想要注册到MBeanServer中就必须要符合JMX的标准
+
+```java
+//例子
+//作为标准MBEAN而被管理，就需要实现一个接口。这个接口的名称必须是类名加上MBean。
+public interface TomcatUtilMBean {
+    void setServerName(String serverName);
+
+    String getServerName();
+
+    void setPort(int port);
+
+    int getPort();
+
+    String getTomcatInfo();
+
+    int add(int x ,int y);
+}
+
+public class TomcatUtil implements TomcatUtilMBean {
+
+    private String serverName = "Catalina";
+    private int port = 8080;
+
+    @Override
+    public String getServerName() {
+        return serverName;
+    }
+
+    @Override
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+    @Override
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    @Override
+    public String getTomcatInfo() {
+        return "The Tomcat's name is " + serverName + ",port is " + port;
+    }
+
+    @Override
+    public int add(int x, int y) {
+        return x+y;
+    }
+}
+
+public class TomcatMonitor {
+    public static void main(String[] args) throws MalformedObjectNameException, NotCompliantMBeanException, InstanceAlreadyExistsException, MBeanRegistrationException, InterruptedException {
+        MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        TomcatUtil tomcatUtil = new TomcatUtil();
+        mBeanServer.registerMBean(tomcatUtil,new ObjectName("myBean:name=tomcatUtil"));
+        while (true) {
+            Thread.sleep(1000);
+        }
+    }
+}
+```
+
+> 启动jconsole,对这个java程序进行监控，点击MBean，可以查看管理注册的实例
+
+## 基于JMX
+
+Tomcat会为每个组件进行注册过程，通过Registry管理起来，而Registry是基于JMX来实现的，因此在看组件的init和start过程实际上就是初始化MBean和触发MBean的start方法，会大量看到形如：
+
+Registry.getRegistry(null, null).invoke(mbeans, "init", false);
+
+Registry.getRegistry(null, null).invoke(mbeans, "start", false);
+
+这样的代码，这实际上就是通过JMX管理各种组件的行为和生命期。
+
+## 事件侦听
+
+各个组件在其生命期中会有各种各样行为，而这些行为都有触发相应的事件，Tomcat就是通过侦听这些时间达到对这些行为进行扩展的目的。在看组件的init和start过程中会看到大量如：
+
+fireLifecycleEvent(AFTER_START_EVENT, null);这样的代码，这就是对某一类型事件的触发，如果你想在其中加入自己的行为，就只用注册相应类型的事件即可。
+
+## Tomcat问题
+
+1、context是如何选择对应的Servlet？
+
+每一个Wrapper代表了一个Servlet，在StandardContextValve中通过（org.apache.catalina.connector）Request.getWrapper获取对应的Wrapper,每一个Request中包含了MappingData对象，MappingData中包含了Wrapper。
+
+2、tomcat类加载机制
+
+![](images\Tomcat类加载机制.png)
+
+前三个深色的类加载器，是JVM默认的类加载，后面浅色的则是tomcat的自定义的 类加载器，
+
+CommonClassLoader加载的路径/common/*
+
+CatalinaClassLoader加载的路径/server/*
+
+ShardClassLoader加载的路径lib目录和WEB-INF/*
+
+WebAppClassLoader和JasperLoader通常会存在多个实例，每一个Web应用对应一个WebAppClassLoader,
+
+一个jsp文件对应一个JasperLoader。
+
+- Common ClassLoader:Tomcat中最基本的类加载器，加载class可以被Tomcat容器本身以及各个Webapp访问
+- catalina Loader：Tomcat容器私有的类加载器，加载路径中的class对于Webapp不可见；
+- shared Loader：各个Webapp共享的类加载器，加载路径中的class对于所有Webapp可见，但是对于Tomcat容器不可见；
+- WebappClassLoader：各个Webapp私有的类加载器，加载路径中的class只对当前Webapp可见
+  
+
+> CommonClassLoader能加载的类都可以被Catalina ClassLoader和SharedClassLoader使用，从而实现了公有类库的共用，而CatalinaClassLoader和Shared ClassLoader自己能加载的类则与对方相互隔离。
+>
+> WebAppClassLoader可以使用SharedClassLoader加载到的类，但各个WebAppClassLoader实例之间相互隔离。
+>
+> 而JasperLoader的加载范围仅仅是这个JSP文件所编译出来的那一个.Class文件，它出现的目的就是为了被丢弃：当Web容器检测到JSP文件被修改时，会替换掉目前的JasperLoader的实例，并通过再建立一个新的Jsp类加载器来实现JSP文件的HotSwap功能。
+
+**那么问题来了tomcat是否破坏了双亲委派机制？**
+
+双亲委派机制，要求从顶层classloader开始加载，当父类加载器加载不到class，就会让其子类加载器加载，到最后也加载不到，就会抛异常ClassNotFoundException。
+
+很显然，tomcat加载并没有让父加载器开始加载，每个WebappClassLoader都是直接加载自己指定路径下的，不会传给父类加载器，所以说tomcat是破坏了双亲委派机制。
+
+**在一个问题，如果tomcat的CommonLoader想要加载WebAppClassLoaer中的类，怎么办**
+
+使用线程上下文类加载器实现，实现线程上下文加载器，可以让父类加载器请求子类加载器去完成类加载 的动作。
+
+**假如我们自己写了一个java.lang.String的类，我们是否可以替换调JDK本身的类**
+
+jvm具体规定了针对java.*开头的类，必须是有BootStrap类加载器来加载。所以就算是自定义一个ClassLoader，打破双亲委派机制，也是无法加载自定义java.lang.String。
+
+还有就是因为默认加载的机制，从顶向下加载，Boostrap会在指定的路径下加载java.lang.String。
+
+> ### 线程上下文类加载器
+>
+> 这个类加载器可以通过Thread的setContextClassLoader进行设置。如果创建线程还未设置，那么将会从父线程中继承一个，如果在应用程序的全局范围内都没有设置过，那么这个类加载器默认就是应用程序类加载器。
+
+3、Tomcat是个web容器，那么它还要解决什么问题？
+
+1. 一个web容器可以部署多个应用，但是不同应用可能依赖同一个第三方类库的不同版本，所以不能要求同一个类库在一个服务器中只有一份，因此要保证每个应用程序的类库都是独立的，保证相互隔离。
+2. 部署在同一服务器的同一类库的相同版本可以共享，否则服务器中有10个应用程序，就会加载10份相同的类库到虚拟机。
+3. web容器也有自己依赖的类库，不能与应用程序的类库混淆。基于安全考虑，应该让容器的类库和程序的类库隔离开来。
+4. web容器要支持jsp的修改，修改后的jsp是不会重新加载，每个jsp文件对应一个唯一的类加载器，当一个jsp文件修改了，就直接卸载这个jsp类加载器。重新创建类加载器，重新加载jsp文件
 
