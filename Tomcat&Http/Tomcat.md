@@ -726,7 +726,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 ## JMX
 
-JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等[植入](https://baike.baidu.com/item/植入/7958584)管理功能的框架
+JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架
 
 ### MBeanServer
 
@@ -797,7 +797,7 @@ public class TomcatUtil implements TomcatUtilMBean {
 }
 
 public class TomcatMonitor {
-    public static void main(String[] args) throws MalformedObjectNameException, NotCompliantMBeanException, InstanceAlreadyExistsException, MBeanRegistrationException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         TomcatUtil tomcatUtil = new TomcatUtil();
         mBeanServer.registerMBean(tomcatUtil,new ObjectName("myBean:name=tomcatUtil"));
