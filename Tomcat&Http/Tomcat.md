@@ -887,3 +887,127 @@ jvm具体规定了针对java.*开头的类，必须是有BootStrap类加载器�
 3. web容器也有自己依赖的类库，不能与应用程序的类库混淆。基于安全考虑，应该让容器的类库和程序的类库隔离开来。
 4. web容器要支持jsp的修改，修改后的jsp是不会重新加载，每个jsp文件对应一个唯一的类加载器，当一个jsp文件修改了，就直接卸载这个jsp类加载器。重新创建类加载器，重新加载jsp文件
 
+# Tomcat启动分析后续
+
+- bootstrap.init()引导程序的初始化
+
+
+1. initClassLoaders(),这一步创建了commonLoader，catalinaLoader，sharedLoader，都是使用URLClassLoader构造类加载器，而commonLoader是catalinaLoader和sharedLoader的parent
+
+   ```java
+   private ClassLoader createClassLoader(String name, ClassLoader parent)
+           throws Exception {
+           //从properties中获得common.loader键对应的值：
+   //"${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar"
+           String value = CatalinaProperties.getProperty(name + ".loader");
+           if ((value == null) || (value.equals("")))
+               return parent;
+   
+           value = replace(value);
+   		//Repository中包含了资源路径，和RepositoryType(DIR,GLOB,JAR,URL)
+           List<Repository> repositories = new ArrayList<>();
+   
+           String[] repositoryPaths = getPaths(value);
+   ===================================从这里开始时判断资源路径的==================================
+           for (String repository : repositoryPaths) {
+               // Check for a JAR URL repository
+               try {
+                   @SuppressWarnings("unused")
+                   URL url = new URL(repository);
+                   repositories.add(new Repository(repository, RepositoryType.URL));
+                   continue;
+               } catch (MalformedURLException e) {
+                   // Ignore
+               }
+   
+               // Local repository
+               if (repository.endsWith("*.jar")) {
+                   repository = repository.substring
+                       (0, repository.length() - "*.jar".length());
+                   repositories.add(new Repository(repository, RepositoryType.GLOB));
+               } else if (repository.endsWith(".jar")) {
+                   repositories.add(new Repository(repository, RepositoryType.JAR));
+               } else {
+                   repositories.add(new Repository(repository, RepositoryType.DIR));
+               }
+           }
+   =============================================================================================
+           return ClassLoaderFactory.createClassLoader(repositories, parent);//进入该行
+       }
+   ```
+
+2. ```java
+   //根据给定的资源路径创建classloader,URLClassLoader的构造器构造类加载器.
+   public static ClassLoader createClassLoader(List<Repository> repositories,
+                                                   final ClassLoader parent) throws Exception {
+       // Construct the "class path" for this class loader
+       Set<URL> set = new LinkedHashSet<>();
+       //............
+        final URL[] array = set.toArray(new URL[set.size()]);
+           if (log.isDebugEnabled())
+               for (int i = 0; i < array.length; i++) {
+                   log.debug("  location " + i + " is " + array[i]);
+               }
+   
+           return AccessController.doPrivileged(
+                   new PrivilegedAction<URLClassLoader>() {
+                       @Override
+                       public URLClassLoader run() {
+                           if (parent == null)
+                               return new URLClassLoader(array);
+                           else
+                               return new URLClassLoader(array, parent);
+                       }
+                   });
+   }
+   ```
+
+以上三个类加载器初始化完成后，回到init方法中，设置线程上下文类加载器为catalinaloader,并对catalinaloader进行安全检查设置
+
+![](images\1.png)zh
+
+这一步用catalinaLoader加载了tomcat中的核心类
+
+![](D:\0_LeargingSummary\Tomcat&Http\images\2.png)
+
+- WebAppClassLoader
+
+  该classloader是各个webapp的私有加载器，与Context有关，该classloader随着StandardContext的启动而创建
+
+  ```java
+  protected synchronized void startInternal() throws LifecycleException {
+      //...........
+          if (getLoader() == null) {
+              WebappLoader webappLoader = new WebappLoader();
+              webappLoader.setDelegate(getDelegate());
+              setLoader(webappLoader);
+          }
+      //...............
+  }
+  
+  //调用WebappLoader中的startInternal
+  
+  
+  //WebappLoader
+  private WebappClassLoaderBase createClassLoader()
+          throws Exception {
+  
+          Class<?> clazz = Class.forName(loaderClass);
+          WebappClassLoaderBase classLoader = null;
+  
+          if (parentClassLoader == null) {
+              parentClassLoader = context.getParentClassLoader();
+          } else {
+              context.setParentClassLoader(parentClassLoader);
+          }
+          Class<?>[] argTypes = { ClassLoader.class };
+          Object[] args = { parentClassLoader };
+          Constructor<?> constr = clazz.getConstructor(argTypes);
+          classLoader = (WebappClassLoaderBase) constr.newInstance(args);
+  
+          return classLoader;
+      }
+  ```
+
+  
+
