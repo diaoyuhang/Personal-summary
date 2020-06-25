@@ -315,7 +315,7 @@ public interface Valve {
 2.调用bootstrap的load方法
 	通过反射获得启动程序catalina的load方法，并执行load方法；
 	创建digester，解析xml文件的输入流，比如server.xml
-	给StandardServer，的initInternal()方法；服务器对象设置Catalina对象，调用服务器对象的init方法（因为继承了LifecycleMBeanBase）,会进入到LifecycleBase的init方法，然后再调用StandardServer的initInternal()方法：
+	调用StandardServer的initInternal()方法；服务器对象设置Catalina对象，调用服务器对象的init方法（因为继承了LifecycleMBeanBase）,会进入到LifecycleBase的init方法，然后再调用StandardServer的initInternal()方法：
 	（1）获得JmxMBeanServer对象；
 	（2）创建beanfactory并设置容器；
 	（3）通过catalina获得classload，如果存在需要加载的路径（这里还涉及到了Classload的双亲委派机制）；
@@ -887,7 +887,7 @@ jvm具体规定了针对java.*开头的类，必须是有BootStrap类加载器�
 3. web容器也有自己依赖的类库，不能与应用程序的类库混淆。基于安全考虑，应该让容器的类库和程序的类库隔离开来。
 4. web容器要支持jsp的修改，修改后的jsp是不会重新加载，每个jsp文件对应一个唯一的类加载器，当一个jsp文件修改了，就直接卸载这个jsp类加载器。重新创建类加载器，重新加载jsp文件
 
-# Tomcat启动分析后续
+# Tomcat分析后续
 
 - bootstrap.init()引导程序的初始化
 
@@ -1009,5 +1009,74 @@ jvm具体规定了针对java.*开头的类，必须是有BootStrap类加载器�
       }
   ```
 
-  
+
+## addShutdownHook
+
+在catalina.start()方法中，调用完getServer().start()后，Runtime.getRuntime().addShutdownHook(shutdownHook)，添加CatalinaShutdownHook钩子函数。简单来说，如果用户的程序出现了bug， 或者使用control + C 关闭了命令行，那么就需要做一些内存清理的工作。该方法就会再虚拟机退出时做清理工作
+
+```java
+    protected class CatalinaShutdownHook extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                if (getServer() != null) {
+                    //调用Catalina的stop方法
+                    Catalina.this.stop();
+                }
+            } catch (Throwable ex) {
+                ExceptionUtils.handleThrowable(ex);
+                log.error(sm.getString("catalina.shutdownHookFail"), ex);
+            } finally {
+                // If JULI is used, shut JULI down *after* the server shuts down
+                // so log messages aren't lost
+                LogManager logManager = LogManager.getLogManager();
+                if (logManager instanceof ClassLoaderLogManager) {
+                    ((ClassLoaderLogManager) logManager).shutdown();
+                }
+            }
+        }
+    }
+
+    public void stop() {
+
+        try {
+            // Remove the ShutdownHook first so that server.stop()
+            // doesn't get invoked twice
+            if (useShutdownHook) {
+                //移除这个钩子函数
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+
+                // If JULI is being used, re-enable JULI's shutdown to ensure
+                // log messages are not lost
+                LogManager logManager = LogManager.getLogManager();
+                if (logManager instanceof ClassLoaderLogManager) {
+                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(
+                            true);
+                }
+            }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // This will fail on JDK 1.2. Ignoring, as Tomcat can run
+            // fine without the shutdown hook.
+        }
+
+        
+        //关闭server，内部调用stopInternal，一次关闭内部容器
+        try {
+            Server s = getServer();
+            LifecycleState state = s.getState();
+            if (LifecycleState.STOPPING_PREP.compareTo(state) <= 0
+                    && LifecycleState.DESTROYED.compareTo(state) >= 0) {
+                // Nothing to do. stop() was already called
+            } else {
+                s.stop();
+                s.destroy();
+            }
+        } catch (LifecycleException e) {
+            log.error("Catalina.stop", e);
+        }
+
+    }
+```
 
