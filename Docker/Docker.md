@@ -95,7 +95,7 @@ exec 在对应容器中执行命令
 
 ## 六、容器生命周期
 
-![](D:\0_LeargingSummary\Docker\images\容器生命周期.png)
+![](images\容器生命周期.png)
 
 ## 七、Dockerfile镜像描述文件
 
@@ -187,9 +187,77 @@ ADD docker-web ./docker-web 将docker-web目录的文件拷贝到容器中docker
 
 临时容器在创建过程中是会被重用的
 
-![](D:\0_LeargingSummary\Docker\images\QQ截图20200726144625.png)
+![](images\QQ截图20200726144625.png)
 
-## 三、事例：mysql
+## 十、容器间link单向通信
+
+docker中每个容器都是天然的能够互相访问的
+
+`docker inspect 容器id`查看容器的元数据信息，其中就能看到ip地址
+
+**缺点：容器的ip地址是会变的，如果A容器访问B容器，写固定的ip那么以后ip变化就会造成诸多不便**
+
+解决办法：在创建容器的时候，关联上需要访问的容器name，docker会自动帮我们转发到对应的容器
+
+`实例：docker run -d --name web --link db tomcat`
+
+## 十一、Bridge网桥双向通信
+
+完全虚拟出来的组件，docker本身通过网桥将数据传输到宿主机的物理网卡
+
+可以将多个容器绑定到一个网桥，那么这几个容器就是互联互通的
+
+`docker network ls`查看docker网络服务的明细
+
+![](images\QQ截图20200727104221.png)
+
+`docker network create -d bridge mybridge`创建一个网桥
+
+`docker network connect 网桥名称 容器name`将容器绑定到指定网桥
+
+## 十二、容器间共享数据
+
+1. 通过设置-v挂载宿主机目录
+
+   格式：
+   docker run --name 容器名  -v 宿主机路径:容器内挂载路径 镜像名
+   实例：
+   docker run -d --name t1 -p 8000:8080 -v /opt/module/webapps:/usr/local/tomcat/webapps/ROOT tomcat
+
+2. 通过--volumes-from 共享容器内挂载点
+
+   docker create --name webpages -v /opt/module/webapps:/usr/local/tomcat/webapps/ROOT tomcat /bin/true
+
+   创建一个共享容器，不运行，/bin/true 只是占位没有实际的意义
+
+## 十三、Docker Compose
+
+WIN/MAC 默认提供docker compse,linux需要安装
+
+`docker-compose up -d`
+
+`docker-compose down`
+
+```yaml
+version: "3.3" #指定docker compose版本解析
+services:
+  db: #容器运行服务名称
+    build: ./bsbdj-db/
+    restart: always #当服务挂掉后，重新启动新的服务
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  app:
+    build: ./bsbdj-app/
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    restart: always
+```
+
+
+
+## 十四、事例：mysql
 
 ```sh
 #拉取msyql,默认罪行latest
@@ -199,7 +267,7 @@ docker run ‐p 3306:3306 ‐‐name mysql02 ‐e MYSQL_ROOT_PASSWORD=123456 ‐
 mysql
 ```
 
-## 四、事例：rabbitmq
+## 十五、事例：rabbitmq
 
 - 拉取镜像
 
@@ -213,7 +281,7 @@ docker pull rabbitmq:3.8-rc-management
 docker run -d --name="MyRabbitMQ" -p 5672:5672 -p 15672:15672 rabbitmq:TAG
 ```
 
-## 五、构建YApi
+## 十六、构建YApi
 
 **1、启动 MongoDB**
 
