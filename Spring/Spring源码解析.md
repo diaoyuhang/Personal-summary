@@ -2,7 +2,7 @@
 
 ## 概览
 
-![](D:\0_LeargingSummary\Spring\images\Spring创建对象粗略图.png)
+![](images\Spring创建对象粗略图.png)
 
 > ### Spring 给出了扩展：
 >
@@ -18,7 +18,7 @@
 
 ## 架构设计过程（抽象出接口）
 
-![](D:\0_LeargingSummary\Spring\images\架构设计过程.png)
+![](images\架构设计过程.png)
 
 ## BeanFactory
 
