@@ -4,7 +4,7 @@
 
 1. 编写国际化配置文件，抽取出页面需要的文件
 
-![](D:\0_LeargingSummary\SpringBoot\images\国际化配置文件.png)
+![](images\国际化配置文件.png)
 
 
 
@@ -429,7 +429,7 @@ public class MyErrorAttribute extends DefaultErrorAttributes {
 }
 ```
 
-![](D:\0_LeargingSummary\SpringBoot\images\错误结果返回.png)
+![](images\错误结果返回.png)
 
 ## 五、SpringBoot配置文件官方参考
 
@@ -441,11 +441,11 @@ https://docs.spring.io/spring-boot/docs/2.1.11.RELEASE/reference/html/common-app
 
 **@EnableAutoConfiguration作用：利用AutoConfigurationImportSelector给容器中导入一些组件**
 
-![](D:\0_LeargingSummary\SpringBoot\images\@SpringBootApplication.png)
+![](images\@SpringBootApplication.png)
 
 **2、进入注解@EnableAutoConfiguration,可以看@Import引入了一个自动配置，AutoConfigurationImportSelector**
 
-![](D:\0_LeargingSummary\SpringBoot\images\@EnableAutoConfiguration.png)
+![](images\@EnableAutoConfiguration.png)
 
 **3、进入AutoConfigurationImportSelector类中,以下是自动加载各种容器组件流程**
 
@@ -525,7 +525,7 @@ private static Map<String, List<String>> loadSpringFactories(@Nullable ClassLoad
 
 **5、返回集合中包含了配置文件中所有的自动配置组件**
 
-![](D:\0_LeargingSummary\SpringBoot\images\自动加载的容器组件.png)
+![](images\自动加载的容器组件.png)
 
 
 
@@ -652,7 +652,7 @@ org.springframework.boot.autoconfigure.webservices.WebServicesAutoConfiguration,
 org.springframework.boot.autoconfigure.webservices.client.WebServiceTemplateAutoConfiguration
 ```
 
-![](D:\0_LeargingSummary\SpringBoot\images\EnableAutoConfiguration加载组件泳道图.png)
+![](images\EnableAutoConfiguration加载组件泳道图.png)
 
 **6、每一个这样的 xxxAutoConfiguration类都是容器中的一个组件，都加入到容器中；用他们来做自动配置**
 
