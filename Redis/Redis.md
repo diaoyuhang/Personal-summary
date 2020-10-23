@@ -106,11 +106,11 @@
 
 # List操作命令
 
-![](D:\0_LeargingSummary\Redis\images\list操作命令.png)
+![](\images\list操作命令.png)
 
 ## LPush\LRange\Lpop
 
-![](D:\0_LeargingSummary\Redis\images\LPush.png)
+![](\images\LPush.png)
 
 ```shell
 127.0.0.1:6379> LPUSH k3 1 2 3 4 5 6
@@ -162,11 +162,11 @@ OK
 
 > ### 类似于hashmap
 
-![](D:\0_LeargingSummary\Redis\images\hash.png)
+![](images\hash.png)
 
 ## hset\hmset\hget\hmget\hkeys\hvals\hgetall
 
-![](D:\0_LeargingSummary\Redis\images\hash一系列操作.png)
+![](images\hash一系列操作.png)
 
 ```shell
 127.0.0.1:6379> HSET person name diao
@@ -187,7 +187,7 @@ OK
 
 ## HIncrByFloat
 
-![](D:\0_LeargingSummary\Redis\images\HIncrByFloat.png)
+![](images\HIncrByFloat.png)
 
 ```shell
 127.0.0.1:6379> HINCRBYFLOAT person age 2.3 #增长其中一个字段
@@ -198,11 +198,11 @@ OK
 
 > 无序不重复集合
 
-![](D:\0_LeargingSummary\Redis\images\set操作命令.png)
+![](images\set操作命令.png)
 
 ## sadd\sinter\sinterstore\smembers\sunion\sdiff
 
-![](D:\0_LeargingSummary\Redis\images\set一系列操作.png)
+![](images\set一系列操作.png)
 
 ```shell
 127.0.0.1:6379> SADD k1  4 3 2 1 5 4 3 2 1 #添加集合元素

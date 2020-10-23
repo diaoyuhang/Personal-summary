@@ -1,0 +1,12 @@
+### 注解@EnableEurekaServer
+
+作用：启动eurekServer；
+
+- 该注解中会导入EurekaServerMarkerConfiguration类，@Import(EurekaServerMarkerConfiguration.class)；
+
+- EurekaServerMarkerConfiguration是一个配置类，向spring容器中注入一个Marker对象,负责标记激活EurekaServerAutoConfiguration
+
+- Springboot启动的时候会扫描META-INFO下的spring.factories文件，导入了EurekaServerAutoConfiguration；
+- EurekaServerAutoConfiguration中@Import(EurekaServerInitializerConfiguration.class)，导入EurekaServerInitializerConfiguration；
+- EurekaServerInitializerConfiguration实现了SmartLifecycle接口，会在spring容器刷新的最后一步被调用执行start()方法；
+

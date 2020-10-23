@@ -296,7 +296,7 @@
 
 
 
-![](D:\0_LeargingSummary\Spring\images\ApplicationContext继承体系结构.png)
+![](images\ApplicationContext继承体系结构.png)
 
 ```java
 /**

@@ -197,7 +197,7 @@ logging:
 
 - Eureka客户端生命周期工作流程图
 
-![](D:\0_LeargingSummary\SpringCloud\images\Eureka Client工作流程图.jpg)
+![](images\Eureka Client工作流程图.jpg)
 
 #### 4）Eureka总结
 

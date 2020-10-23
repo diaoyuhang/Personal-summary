@@ -601,7 +601,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 ### 线程模型结构
 
-![](D:\0_LeargingSummary\Tomcat&Http\images\线程模型.jpg)
+![](images\线程模型.jpg)
 
 1. NioEndpoint中startInternal方法中开启上图中的Acceptor线程，Poller线程以及Executor线程池
 
