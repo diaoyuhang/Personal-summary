@@ -21,29 +21,29 @@
 
 ## 命令学习方式
 
-![](D:\0_LeargingSummary\Redis\images\redis-cli_help命令.png)
+![](images\redis-cli_help命令.png)
 
 # String命令操作
 
-![](D:\0_LeargingSummary\Redis\images\String类型的命令操作.png)
+![](images\String类型的命令操作.png)
 
 
 
 ## set
 
-![](D:\0_LeargingSummary\Redis\images\set.png)
+![](images\set.png)
 
 ## mset批量设置
 
-![](D:\0_LeargingSummary\Redis\images\mset多值插入.png)
+![](images\mset多值插入.png)
 
 ## append追加
 
-![](D:\0_LeargingSummary\Redis\images\append.png)
+![](images\append.png)
 
 ## setrange指定下标设值
 
-![](D:\0_LeargingSummary\Redis\images\setrange.png)
+![](images\setrange.png)
 
 ```shell
 127.0.0.1:6379> SETRANGE k1 3 2
@@ -54,63 +54,63 @@
 
 ## strlen获取值的长度
 
-![](D:\0_LeargingSummary\Redis\images\strlen.png)
+![](images\strlen.png)
 
 ## getrange获取指定下标范围内值
 
 有正向索引还有反向索引
 
-![](D:\0_LeargingSummary\Redis\images\getrange.png)
+![](images\getrange.png)
 
 ## Type获取key的类型
 
 > key包含type
 
-![](D:\0_LeargingSummary\Redis\images\type.png)
+![](images\type.png)
 
 ## Object获取key对应值的类型
 
 > key中包含encoding
 
-![](D:\0_LeargingSummary\Redis\images\object检查redis对象.png)
+![](images\object检查redis对象.png)
 
 ## String数值的操作
 
-![](D:\0_LeargingSummary\Redis\images\String数值的操作.png)
+![](images\String数值的操作.png)
 
 ## getset获取设置
 
-![](D:\0_LeargingSummary\Redis\images\getset.png)
+![](images\getset.png)
 
 ## setbit
 
 **bitmap位图示意**
 
-![](D:\0_LeargingSummary\Redis\images\对二进制的操作.png)
+![](images\对二进制的操作.png)
 
-![](D:\0_LeargingSummary\Redis\images\setbit.png)
+![](images\setbit.png)
 
 ## bitpos
 
-![](D:\0_LeargingSummary\Redis\images\bitpos.png)
+![](images\bitpos.png)
 
 ## bitcount统计二进制1出现的次数
 
-![](D:\0_LeargingSummary\Redis\images\bitcount.png)
+![](images\bitcount.png)
 
 ## bitop二进制计算
 
-![](D:\0_LeargingSummary\Redis\images\bitop.png)
+![](images\bitop.png)
 
 > ### 注：使用bitmap操作，典型应用：统计用户登录天数，比如统计1年，就使用365位二进制，第几天登录了就标为1
 
 # List操作命令
 
-![](\images\list操作命令.png)
+![](images\list操作命令.png)
 
 ## LPush\LRange\Lpop
 
-![](\images\LPush.png)
+![](images\LPush.png)
 
 ```shell
 127.0.0.1:6379> LPUSH k3 1 2 3 4 5 6
@@ -127,7 +127,7 @@
 
 ## LIndex\Lset
 
-![](D:\0_LeargingSummary\Redis\images\LIndex-LSet.png)
+![](images\LIndex-LSet.png)
 
 ```shell
 127.0.0.1:6379> LINDEX k3 1
@@ -144,19 +144,19 @@ OK
 
 ## LRem移除指定个数的元素
 
-![](D:\0_LeargingSummary\Redis\images\LRem.png)
+![](images\LRem.png)
 
 ## LInsert
 
-![](D:\0_LeargingSummary\Redis\images\LInsert.png)
+![](images\LInsert.png)
 
 ## BLPOP阻塞获取
 
-![](D:\0_LeargingSummary\Redis\images\BLpop.png)
+![](images\BLpop.png)
 
 ## LTrim
 
-![](D:\0_LeargingSummary\Redis\images\LTrim.png)
+![](images\LTrim.png)
 
 # Hash
 
@@ -218,7 +218,7 @@ OK
 
 ## SRandMember\Spop
 
-![](D:\0_LeargingSummary\Redis\images\SRandMember-spop.png)
+![](images\SRandMember-spop.png)
 
 ```shell
 127.0.0.1:6379> SRANDMEMBER k1 6 #正数：取出一个去重的结果集（不能超过已有集）
@@ -238,11 +238,11 @@ OK
 
 # sorted_set
 
-![](D:\0_LeargingSummary\Redis\images\sort_set操作命令.png)
+![](images\sort_set操作命令.png)
 
 ## ZAdd\ZRange\ZRevRange\
 
-![](D:\0_LeargingSummary\Redis\images\sorted_set一系列操作.png)
+![](images\sorted_set一系列操作.png)
 
 ```shell
 127.0.0.1:6379> ZADD k1 1 apple 5 orange 2 banana
@@ -269,7 +269,7 @@ OK
 
 ## ZScore\ZRank\ZRange\ZIncrBy\
 
-![](D:\0_LeargingSummary\Redis\images\ZScore.png)
+![](images\ZScore.png)
 
 # 管道
 
@@ -291,7 +291,7 @@ $1
 
 # PUB\SUB
 
-![](D:\0_LeargingSummary\Redis\images\pub-sub.png)
+![](images\pub-sub.png)
 
 ```shell
 127.0.0.1:6380> SUBSCRIBE ooxx  #无法收到订阅之前的消息
@@ -308,7 +308,7 @@ Reading messages... (press Ctrl-C to quit)
 
 # 事务
 
-![](D:\0_LeargingSummary\Redis\images\事务.png)
+![](images\事务.png)
 
 ```shell
 127.0.0.1:6380> MULTI #开始一个事务
@@ -508,7 +508,7 @@ echo $$|more
 echo $BASHPID|more
 ```
 
-![](D:\0_LeargingSummary\Redis\images\管道出发子进程.png)
+![](images\管道出发子进程.png)
 
 正常情况下，进程之间的数据是隔离的。
 
@@ -534,7 +534,7 @@ Redis中进行bgsave的时候就是调用fork创建子进程，子进程进行�
 - Y：根据业务功能进行拆分，不同的业务访问不同的主节点，从而可以减轻访问的压力；
 - Z：进行逻辑上的拆分，在满足条件的情况下，将数据存到不同的结点上，从而解决容量有限的问题；
 
-![](D:\0_LeargingSummary\Redis\images\AKF拆分.png)
+![](images\AKF拆分.png)
 
 > ## Redis默认采用的异步复制，其特点是低延迟和高性能
 >
