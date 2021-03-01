@@ -11,7 +11,9 @@
 
 # Redis知识总结
 
-> ### redis是二进制安全的，是按照字节数组的形式存储的
+> ### 什么是二进制安全：传给我的数据的二进制是什么样，存在我这里就是什么样，不会对这些数据再进行编码或序列化
+>
+> ### redis是二进制安全的，是按照字节数组的形式存取得，不会变化存储的数据，不会有溢出和覆盖，不会有乱码问题
 >
 > ### redis-cli --raw启动客户端，获取值会按照编码格式进行显示，而不是显示ASCII码
 >
@@ -410,8 +412,8 @@ volatile-lru -> Evict using approximated LRU among the keys with an expire set.
 allkeys-lru -> Evict any key using approximated LRU.
 volatile-lfu -> Evict using approximated LFU among the keys with an expire set.
 allkeys-lfu -> Evict any key using approximated LFU.
-# lfu最少使用
-# lru最久未使用
+# lfu最近最少使用
+# lru最近最久未使用
 ```
 
 # CAP
