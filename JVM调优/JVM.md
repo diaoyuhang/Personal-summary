@@ -2,7 +2,7 @@
 
 > ### java从编码到执行
 
-![](D:\0_LeargingSummary\JVM调优\images\java从编码到执行.png)
+![](images\java从编码到执行.png)
 
 > ### JDK JRE JVM
 
@@ -10,7 +10,7 @@
 
 # Class File Format
 
-![](D:\0_LeargingSummary\JVM调优\images\class文件格式信息.png)
+![](images\class文件格式信息.png)
 
 # Class加载周期
 
@@ -18,7 +18,7 @@
 >
 > 2、创建new->申请内存->赋默认值->初始化值
 
-![](D:\0_LeargingSummary\JVM调优\images\class加载过程.png)
+![](images\class加载过程.png)
 
 # 类加载：loading阶段
 
@@ -105,13 +105,13 @@ private Class<?> defineClass(String name, Resource res) throws IOException {
 - ThreadContextClassLoader可以实现基础类调用实现类代码，通过thread.setContextClassLoader指定
 - 热启动，热部署：tomcat都要自己的模块指定classLoader(可以加载同一类库不同版本)
 
-![](D:\0_LeargingSummary\JVM调优\images\父加载器.png)
+![](images\父加载器.png)
 
 # 混合模式
 
 > #### JIT能将java代码编译成本地代码执行
 
-![](D:\0_LeargingSummary\JVM调优\images\混合模式.png)
+![](images\混合模式.png)
 
 # Linking阶段
 
@@ -230,7 +230,7 @@ synchronized实现细节
 
 每一个线程都有自己的工作内存，从主内存中将变量加载自己的工作空间，然后在返回写到主内存，如果变量加了volatile,则JVM在变量读写前后都加屏障，保证不乱序。
 
-![](D:\0_LeargingSummary\JVM调优\images\java并发内存模型.png)
+![](images\java并发内存模型.png)
 
 ## 对象的内存布局
 
@@ -297,7 +297,7 @@ new P()占32字节
 
 - 对象头具体包括什么
 
-![](D:\0_LeargingSummary\JVM调优\images\对象头信息.png)
+![](images\对象头信息.png)
 
 > 当一个对象已经计算过identity hashCode,就无法进入偏向锁状态
 
@@ -310,9 +310,9 @@ new P()占32字节
 
 # Runtime Data Area
 
-![](D:\0_LeargingSummary\JVM调优\images\Run-time data areas.png)
+![](images\Run-time data areas.png)
 
-![](D:\0_LeargingSummary\JVM调优\images\线程共享区域.png)
+![](images\线程共享区域.png)
 
 ## pc 程序计数器
 
@@ -332,7 +332,7 @@ new P()占32字节
 
 ## JVM Stack
 
-![](D:\0_LeargingSummary\JVM调优\images\栈帧.png)
+![](images\栈帧.png)
 
 1. Frame-每一个方法对应一个栈帧
 
@@ -386,13 +386,13 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
 
 利用引用计数的方法，来寻找垃圾，当没有引用指向该对象，计数器为0，该对象为垃圾
 
-![](D:\0_LeargingSummary\JVM调优\images\引用计数.png)
+![](images\引用计数.png)
 
 根可达算法，解决循环引用的问题
 
 > 什么是根对象：线程启动后，马上需要的对象
 
-![](D:\0_LeargingSummary\JVM调优\images\根可达算法.png)
+![](images\根可达算法.png)
 
 ## GC Algorithms
 
@@ -400,27 +400,27 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
 
 > 两边扫描，第一遍找可用标记，第二遍找到不可用并清除，效率低
 
-![](D:\0_LeargingSummary\JVM调优\images\标记清除.png)
+![](images\标记清除.png)
 
-![](D:\0_LeargingSummary\JVM调优\images\标记清除示意图.png)
+![](images\标记清除示意图.png)
 
 
 
 - Copying(拷贝)
 
-![](D:\0_LeargingSummary\JVM调优\images\拷贝算法.png)
+![](images\拷贝算法.png)
 
-![](D:\0_LeargingSummary\JVM调优\images\拷贝算法示意图.png)
+![](images\拷贝算法示意图.png)
 
 - Mark-Compact(标记压缩)
 
-![](D:\0_LeargingSummary\JVM调优\images\标记压缩.png)
+![](images\标记压缩.png)
 
-![](D:\0_LeargingSummary\JVM调优\images\标记压缩示意图.png)
+![](images\标记压缩示意图.png)
 
 ## 堆内存逻辑分区
 
-![](D:\0_LeargingSummary\JVM调优\images\堆内存逻辑分区.png)
+![](images\堆内存逻辑分区.png)
 
 1. 部分垃圾回收器使用的模型
 
@@ -470,7 +470,7 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
 
    参考：https://cloud.tencent.com/developer/article/1082730
 
-![](D:\0_LeargingSummary\JVM调优\images\栈上分配 线程本地分配.png)
+![](images\栈上分配 线程本地分配.png)
 
 ## 对象何时进入老年代
 
@@ -488,9 +488,9 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
 
 ## 对象分配图
 
-![](D:\0_LeargingSummary\JVM调优\images\总结.png)
+![](images\总结.png)
 
-![](D:\0_LeargingSummary\JVM调优\images\栈上分配 线程本地分配.png)
+![](images\栈上分配 线程本地分配.png)
 
 > #### 1、全局逃逸（GlobalEscape）
 >
