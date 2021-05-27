@@ -236,10 +236,20 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,fd_set *exceptfds, struct
 epoll_create、epoll_ctl、epoll_wait
 
 1. 调用epoll_create开辟空间，并返回文件描述符（比如fd4）代表这个空间；
-2. 调用epoll_ctl向fd4这个空间中添加、删除其他文件描述符，这里是红黑树结构；
+2. 调用epoll_ctl向fd4这个空间中添加、删除其他文件描述符，这里是红黑树结构存储；
 3. 调用epoll_wait查看一个链表空间是否有可操作的文件描述符；
 
 **注：当网卡接受到数据或是请求时，产生中断，之后还有一个回调函数将红黑树中的对应有状态文件描述符拷贝到链表中，这是程序调用epoll_wait就可以直接获取到哪些fd可以操作**
+
+
+
+```
+写事件，当在selector上注册了写事件(client.register(key.selector(),SelectionKey.OP_WRITE,buffer)),这时，只要发送队列有空间，就会回调起，我们的写方法
+```
+
+
+
+
 
 ```
 注：异步的IO模型，其真正的读操作是发生在内核中，并不是app去读取数据
