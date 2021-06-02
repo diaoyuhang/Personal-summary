@@ -1,5 +1,5 @@
 ```shell
-命令帮助文档man
+man帮助命令
 
        1   Executable programs or shell commands
        2   System calls (functions provided by the kernel)
