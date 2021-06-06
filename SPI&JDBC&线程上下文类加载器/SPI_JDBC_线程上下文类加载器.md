@@ -6,7 +6,7 @@
 
 ​	当外部程序装配这个模块的时候，就通过META-INF/services/中的配置文件加载具体的实现类名，并装载实例化。jdk中提供这种服务实现查找工具类：java.util.ServiceLoader。
 
-![](D:\0_LeargingSummary\SPI&JDBC&线程上下文类加载器\images\SPI.png)
+![](images\SPI.png)
 
 平时最常见、典型的例子就是java.sql.Driver:
 
