@@ -6,7 +6,7 @@
 
 > ### JDK JRE JVM
 
-![](D:\0_LeargingSummary\JVM调优\images\JDK JRE JVM.png)
+![](..\JVM调优\images\JDK JRE JVM.png)
 
 # Class File Format
 
@@ -128,6 +128,14 @@ private Class<?> defineClass(String name, Resource res) throws IOException {
 将类、方法、属性等符号引用解析为直接引用
 
 常量池中的各种引用解析为指针、偏移量等内存地址的直接引用
+
+- 符号引用、直接引用是什么
+
+  1. 符号引用就是用一组符号来描述所引用的目标，符号可以使任何形式的字面量
+
+     比如一个java文件被编译成一个class文件时，编译的时候，java类并不知道所引用类的实际地址，因此只能使用符号引用来代替。比如org.simple.People类引用了org.simple.Language类，在编译时People类并不知道Language类的实际内存地址，因此只能使用符号org.simple.Language（假设是这个）；
+
+  2. 直接引用就是直接指向目标的指针或者是能够间接定位到目标的句柄；
 
 # Initializing阶段
 
@@ -348,6 +356,13 @@ new P()占32字节
       a() -> b()，方法a调用了方法b, b方法的返回值放在什么地方
 ```
 
+> ## 什么是动态链接
+>
+> Class文件的常量池中存在大量的符号引用
+>
+> - 部分符号引用在类加载阶段（解析）的时候就转化为直接引用，这叫静态链接
+> - 部分符号引用在运行期间转换成直接引用，这叫做动态链接，当再次遇到相同的引用时，可以使用这个直接引用，省去再次解析的步骤
+
 ## Method Area
 
 1.  Perm Space(<1.8)
@@ -456,8 +471,7 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
    2. MinorGC = YGC
    3. MajorGC = FGC
 
-1. 动态年龄：（不重要）
-   
+6. 动态年龄：（不重要）
 
 如果在Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于或等于该年龄的对象就可以直接进入老年代;
 
@@ -518,23 +532,23 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
 
 ## 常见的垃圾回收器
 
-![](D:\0_LeargingSummary\JVM调优\images\常见的垃圾回收器.png)
+![](..\JVM调优\images\常见的垃圾回收器.png)
 
 1. JDK诞生 Serial追随 提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前任何一个JDK版本默认是CMS
    并发垃圾回收是因为无法忍受STW
 2. Serial 年轻代 串行回收
 
-![](D:\0_LeargingSummary\JVM调优\images\Serial.png)
+![](..\JVM调优\images\Serial.png)
 
 1. PS 年轻代 并行回收
 
-![](D:\0_LeargingSummary\JVM调优\images\ParallelScavenge.png)
+![](..\JVM调优\images\ParallelScavenge.png)
 
-1. ParNew 年轻代 配合CMS的并行回收![](D:\0_LeargingSummary\JVM调优\images\ParNew.png)
+1. ParNew 年轻代 配合CMS的并行回收![](..\JVM调优\images\ParNew.png)
 
-2. SerialOld ![](D:\0_LeargingSummary\JVM调优\images\SerialOld.png)
+2. SerialOld ![](..\JVM调优\images\SerialOld.png)
 
-3. ParallelOld![](D:\0_LeargingSummary\JVM调优\images\ParallelOld.png)
+3. ParallelOld![](..\JVM调优\images\ParallelOld.png)
 
 4. ConcurrentMarkSweep 老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms)
    CMS问题比较多，所以现在没有一个版本默认是CMS，只能手工指定
@@ -545,7 +559,7 @@ A  run-time constant pool is a pre-class or per-interface run-time representatio
    
    算法：三色标记 + Incremental Update
 
-![](D:\0_LeargingSummary\JVM调优\images\CMS并发.png)
+![](..\JVM调优\images\CMS并发.png)
 
 1. G1(10ms)
    算法：三色标记 + SATB
@@ -666,9 +680,17 @@ HelloGC!
 
 ## 基础概念
 
--  Card Table 
+- Card Table （CMS）
 
-  如果做YGC时，扫描整个Old区时，效率会非常低，所以JVM设计了CardTable，如果一个old区CardTable中有对象指向Y区，就将它设计为Dirty，下次扫描时，只需要扫描Dirty Card
+  在进行YGC的时候，如果老年代引用了年轻代的对象，就需要跟踪从老年代到新生代所有的引用，就会造成YGC的时候需要扫描整个老年代。
+
+  为了避免这个情况，使用CardTable来解决这个情况；
+
+  卡表是一个比特位的集合，每个比特位可以用来表示老年代某一区域是否有对象持有年轻代对象的应用。
+
+  这样YGC的时候不需要扫描所有老年代对象，来确定每一个对象的引用关系，可以先扫描卡表，如果卡表某一位标记为1，就扫描给定区域的老年代对象；而为0的比特位，就表示执行区域一定不包含对新生代的引用。
+
+  ![](https://image-static.segmentfault.com/308/642/3086427736-56f3fd7753998_fix732)
 
   在结构上，CardTable使用BitMAP来实现的。
 
@@ -682,13 +704,13 @@ HelloGC!
 
   RSet的价值在于使得垃圾收集器的不需要扫描整个堆找到谁引用了当前分区中的对象，只需要扫描RSet即可
 
-  ![](D:\0_LeargingSummary\JVM调优\images\RSet.png)
+  ![](..\JVM调优\images\RSet.png)
 
 ## CMS
 
 ## G1
 
-![](D:\0_LeargingSummary\JVM调优\images\G1.png)
+![](..\JVM调优\images\G1.png)
 
 - whyG1
 
@@ -702,7 +724,7 @@ HelloGC!
 
 - GC何时触发
 
-  - YGC：Eden空间不足，多线程并行执行
+  - YGC：Eden空间不足，多线程并行执行，YGC依然是采用复制存活对象到survivor空间
   - FGC:Old空间不足，System.gc()
 
 - G1逻辑分代，物理不分代，G1垃圾回收器会产生FGC
@@ -711,13 +733,13 @@ HelloGC!
 
 - G1中的MixedGC
 
-  相当于CMS
+  相当于CMS,MixedGC回收的内存区域是新生代+老年代
 
   XX:InitiatingHeapOccupacyPercent 默认45%
 
   当超过这个值，启动MixedGC
 
-  - 过程
+  - 过程 全局并发标记（global concurrent marking）
 
     初始标记STW
 
@@ -726,6 +748,8 @@ HelloGC!
     最终标记STW（重新标记）
 
     筛选回收STW（并行）
+
+  > ## 经过全局并发标记，收集器直到哪些Region有存货对象，并将完全可回收的Region收集起来加入到可分配Region队列，实现对该部分内存的回收。对于有存活对象的Region，G1会选择收益最高，STW开销不超过用户指定的上限的若干Region进行对象回收。这些回收的Region集合叫做Collection Set。
 
 - JAVA10之前是串行FullGC,之后是并行FulllGC
 
@@ -737,11 +761,11 @@ HelloGC!
 
 1. 漏标
 
-   ![](D:\0_LeargingSummary\JVM调优\images\三色标记_漏标.png)
+   ![](..\JVM调优\images\三色标记_漏标.png)
 
    解决办法：
 
-   ![](D:\0_LeargingSummary\JVM调优\images\防止漏标.png)
+   ![](..\JVM调优\images\防止漏标.png)
 
 2. 为什么G1用SATB
 
