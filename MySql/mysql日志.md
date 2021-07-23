@@ -49,7 +49,7 @@ statment、row和mixed
 innodb_flush_log_at_trx_commit ` 参数配置
 
 - 0：事务提交不会立即将redo log buffer写入os buffer,而是每秒提交写入os buffer并调用fsync()刷写到磁盘，当系统崩溃，会丢失1秒钟的数据。
-- 1：事务每次提交都会将redo log buffer中的数据写入os buffer中并调用fsync()写入磁盘，系统崩溃也不会对视数据，io性能较差
+- 1：事务每次提交都会将redo log buffer中的数据写入os buffer中并调用fsync()写入磁盘，系统崩溃也不会丢失数据，io性能较差
 - 2：每次提交都仅仅写入os buffer,然后每秒fsync()写入磁盘
 
 ## **双1设置**
@@ -141,7 +141,7 @@ mysql的主从复制都是单线程操作，主库对所有的ddl和dml的操作
 
   2. 从根本上解决延时问题：并行复制
 
-     ![](D:\0_LeargingSummary\MySql\image\并行复制.png)
+     ![](..\MySql\image\并行复制.png)
 
      通过这张图，可以看到再中间添加了一个分发的环节，原来的sql线程变成现在的coordinator组件，当日志来的时候，coordinator读取日志然后分发日志，执行日志过程是在worker线程上，多个线程并行执行。
 
