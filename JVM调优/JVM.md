@@ -793,7 +793,7 @@ HelloGC!
 
     筛选回收STW（并行）
 
-  > ## 经过全局并发标记，收集器直到哪些Region有存货对象，并将完全可回收的Region收集起来加入到可分配Region队列，实现对该部分内存的回收。对于有存活对象的Region，G1会选择收益最高，STW开销不超过用户指定的上限的若干Region进行对象回收。这些回收的Region集合叫做Collection Set。
+  > ## 经过全局并发标记，收集器直到哪些Region有存活对象，并将完全可回收的Region收集起来加入到可分配Region队列，实现对该部分内存的回收。对于有存活对象的Region，G1会选择收益最高，STW开销不超过用户指定的上限的若干Region进行对象回收。这些回收的Region集合叫做Collection Set。
 
 - JAVA10之前是串行FullGC,之后是并行FulllGC
 
