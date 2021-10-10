@@ -63,7 +63,7 @@ public class RmiConsumer {
 
 ## Dubbo架构图
 
-![](D:\0_LeargingSummary\Dubbo\images\图片1.png)
+![](\images\图片1.png)
 
 1. start:启动Spring后，会自动启动Dubbo的Provider
 2. register:Provider启动后，会向注册中心Registry注册内容,注册的内容包括
