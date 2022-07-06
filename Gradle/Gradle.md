@@ -1,3 +1,105 @@
+![](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-0da0957e5b48dfdd8c975a53d21bcedb_400x224.jpg&refer=http%3A%2F%2Fpic1.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1659700023&t=cbb387c84fadfd1b4a70d6d6c6375fb2)
+
+
+
+## 什么是Gradle
+
+- Gradle是一个通用的构建工具;
+
+- 核心模型基于任务（Task），意味着构建本质上是配置一组任务并将它们连接在一起;
+
+  任务本身包括：
+
+  - 动作——做某事的工作，比如复制文件或编译源代码
+  - 输入——动作使用或操作的值、文件和目录
+  - 输出——操作修改或生成的文件和目录
+
+  ![](https://docs.gradle.org/current/userguide/img/task-dag-examples.png)
+
+- Gradle有几个固定构建阶段
+
+  - 初始化，为构建设置环境并确定哪些项目将参与其中。
+  - 配置，为构建配置任务图，然后根据用户想要运行的任务确定需要运行哪些任务以及以何种顺序运行。
+  - 执行，运行在配置阶段结束时选择的任务。
+
+- Gradle 可以通过多种方式进行扩展
+  - 自定义任务类型，构建完成一些现有任务无法完成的工作时，您可以简单地编写自己的任务类型，通常最好将自定义任务类型的源文件放在buildSrc目录或打包插件中
+  - 自定义任务操作，通过任务的doFirst和doLast方法附加在任务之前或之后执行定义的构建漏记；
+  - 项目和任务的额外属性，将自己的属性添加到项目或任务中；
+  - 自定义约定，约定是一种简化构建的方法，编写自己的插件来提供约定，为构建的相关方面配置默认值。
+
+## Groovy介绍
+
+Groovy是JVM平台上的一种面向对象且同时支持静态动态的脚本语言，语法和Java区别不大，提供了一些语法糖，代码的表达能力更强。
+
+```groovy
+//1、可以用def关键字定义变量和方法，编译期做类型推断
+//2、多变量同时创建
+def (aa, bb) = [1, 2]
+//3、范围创建
+int[] range = 0..10;
+//4、支持for in写法
+for(int i in 1..5) {
+    println(i);
+}
+//5、字符串支持单引号和双引号，双引号中可识别变量
+def res='字符串'
+println("打印结果是：${res}")
+//6、列表创建
+List<String> strings = ["g", "r", "o", "o", "v", "y"]
+//7、map创建
+Map<String, String> stringMap = ["name": "wang", "age": "99"]
+//8、trait关键字声明一个可以有属性和默认实现的接口，Java8之后的接口也都能达到同样效果
+trait Marks {
+    void DisplayMarks() {
+        println("Display Marks");
+    }
+}
+class Student implements Marks {
+    int StudentID
+    int Marks1;
+
+}
+
+Student st = new Student();
+st.StudentID = 1;
+st.Marks1 = 10;
+st.DisplayMarks();
+
+//9、支持闭包，自己Call自己
+def closure = { param -> println "Hello ${param}" };
+closure.call("World");
+
+//也可以省去单个参数，默认是it
+def clos = {println "Hello ${it}"};
+ clos.call("World");
+
+10.times {num -> println num} 
+
+//10、方法调用
+class Student {
+    String StudentID
+
+    String getFun2(){
+        return 'fun2';
+    }
+
+    void fun1(clo) {
+        clo.call(StudentID);
+    }
+}
+
+def student = new Student()
+student.StudentID '99'
+println student.fun2
+println student.studentID
+student.fun1 {println("${it}")}
+
+
+```
+
+
+
 ## 开发Gradle任务
 
 ### [跳过任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:skipping_tasks)
