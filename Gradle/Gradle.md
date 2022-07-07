@@ -94,8 +94,104 @@ student.StudentID '99'
 println student.fun2
 println student.studentID
 student.fun1 {println("${it}")}
+```
 
+## 了解生命周期
 
+### 构建阶段
+
+- 初始化，Gradle 支持单项目和多项目构建。在初始化阶段，Gradle 确定哪些项目将参与构建，并为每个项目创建一个Project实例。
+- 配置，在此阶段配置项目对象。*执行作为构建一部分的所有*项目的构建脚本。
+- 执行Gradle 确定在配置阶段创建和配置的要执行的任务子集。
+
+### [Settings file](https://docs.gradle.org/current/userguide/build_lifecycle.html#sec:settings_file)
+
+除了构建脚本文件，Gradle 还定义了一个设置文件。设置文件由 Gradle 通过命名约定确定。此文件的默认名称是`settings.gradle`。设置文件在初始化阶段执行，多项目构建必须在根目录下有settings.gradle。
+
+```groovy
+//settings.gradle
+rootProject.name = 'basic'
+println 'This is executed during the initialization phase.'
+
+//build.gradle
+println 'This is executed during the configuration phase.'
+
+tasks.register('configured') {
+    println 'This is also executed during the configuration phase, because :configured is used in the build.'
+}
+
+tasks.register('test') {
+    doLast {
+        println 'This is executed during the execution phase.'
+    }
+}
+
+tasks.register('testBoth') {
+	doFirst {
+	  println 'This is executed first during the execution phase.'
+	}
+	doLast {
+	  println 'This is executed last during the execution phase.'
+	}
+	println 'This is executed during the configuration phase as well, because :testBoth is used in the build.'
+}
+```
+
+## 编写构建脚本
+
+```groovy
+//注册任务
+tasks.register('count') {
+    doLast {
+        4.times { print "$it " }
+    }
+}
+
+//任务依赖
+tasks.register('hello') {
+    doLast {
+        println 'Hello world!'
+    }
+}
+tasks.register('intro') {
+    dependsOn tasks.hello
+    doLast {
+        println "I'm Gradle"
+    }
+}
+
+//操作现有任务
+4.times { counter ->
+    tasks.register("task$counter") {
+        doLast {
+            println "I'm task number $counter"
+        }
+    }
+}
+tasks.named('task0') { dependsOn('task2', 'task3') }
+```
+
+## 使用Gradle插件
+
+Gradle所有用的特性，比如编译java代码的能力，都是有插件添加的。
+
+### 插件类型
+
+Gradle 中有两种通用的插件类型，*二进制*插件和*脚本*插件。二进制插件可以通过实现[Plugin](https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html)接口以编程方式编写，也可以使用 Gradle 的一种 DSL 语言以声明方式编写。脚本插件是额外的构建脚本，可以进一步配置构建
+
+## 二进制插件
+
+可以通过*插件 id*应用插件，这是插件的全局唯一标识符或名称。核心 Gradle 插件的特殊之处在于它们提供了短名称，例如`'java'`核心[JavaPlugin](https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaPlugin.html)。
+
+```groovy
+//应用核心插件
+plugins {
+    id 'java'
+}
+//应用社区插件
+plugins {
+    id 'com.jfrog.bintray' version '1.8.5'
+}
 ```
 
 
