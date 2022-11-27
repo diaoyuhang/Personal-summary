@@ -179,7 +179,7 @@ Gradle所有用的特性，比如编译java代码的能力，都是有插件添�
 
 Gradle 中有两种通用的插件类型，*二进制*插件和*脚本*插件。二进制插件可以通过实现[Plugin](https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html)接口以编程方式编写，也可以使用 Gradle 的一种 DSL 语言以声明方式编写。脚本插件是额外的构建脚本，可以进一步配置构建
 
-## 二进制插件
+### 二进制插件
 
 可以通过*插件 id*应用插件，这是插件的全局唯一标识符或名称。核心 Gradle 插件的特殊之处在于它们提供了短名称，例如`'java'`核心[JavaPlugin](https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaPlugin.html)。
 
@@ -194,9 +194,180 @@ plugins {
 }
 ```
 
+### 约定插件
 
+通常，多项目构建中的子项目具有一些共同的特征。对于共同的特征，我们可以编写一个插件来封装给定*类型*的子项目的通用逻辑。建议将约定插件的源代码和测试放在`buildSrc`项目根目录的特殊目录中；
 
 ## 开发Gradle任务
+
+### [定义任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:defining_tasks)
+
+```groovy
+tasks.register('hello') {
+    doLast {
+        println 'hello'
+    }
+}
+
+tasks.register('xxx', xxx) {
+    ....
+}
+```
+
+### [定位任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:locating_tasks)
+
+通常，任务可通过`tasks`集合获得；
+
+```groovy
+tasks.register('hello')
+println tasks.named('hello').get().name
+```
+
+### [配置任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:configuring_tasks)
+
+```groovy
+tasks.register('hello')
+tasks.named('hello') {
+    doLast {
+        println 'hello world'
+    }
+}
+```
+
+### [将参数传递给任务构造函数](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:passing_arguments_to_a_task_constructor)
+
+可以将参数值传递给`Task`类的构造函数。为了将值传递给`Task`构造函数，您必须使用 注释相关的构造函数`@javax.inject.Inject`。
+
+```groovy
+//build.gradle
+abstract class CustomTask extends DefaultTask {
+    final String message
+    final int number
+
+    @Inject
+    CustomTask(String message, int number) {
+        this.message = message
+        this.number = number
+    }
+}
+//创建一个任务，在参数列表的末尾传递构造函数参数
+tasks.register('myTask', CustomTask, 'hello', 42)
+
+```
+
+### [将依赖项添加到任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:adding_dependencies_to_tasks)
+
+- *添加对来自另一个项目的任务的依赖*
+
+  ```groovy
+  project('project-a') {
+      tasks.register('taskX')  {
+          dependsOn ':project-b:taskY'
+          doLast {
+              println 'taskX'
+          }
+      }
+  }
+  
+  project('project-b') {
+      tasks.register('taskY') {
+          doLast {
+              println 'taskY'
+          }
+      }
+  }
+  ```
+
+- *使用任务提供者对象添加依赖项*
+
+  ```groovy
+  def taskX = tasks.register('taskX') {
+      doLast {
+          println 'taskX'
+      }
+  }
+  
+  def taskY = tasks.register('taskY') {
+      doLast {
+          println 'taskY'
+      }
+  }
+  
+  taskX.configure {
+      dependsOn taskY
+  }
+  ```
+
+### 排序任务
+
+*在某些情况下，控制 2 个任务的执行顺序*很有用，而不会在这些任务之间引入显式依赖关系。*任务排序*和任务*依赖*之间的主要区别在于，排序规则不会影响将执行哪些任务，只会影响它们的执行顺序。例如，'build' 永远不会在'clean' 之前运行。
+
+- *添加“*must run after*”任务排序*
+
+  ```groovy
+  def taskX = tasks.register('taskX') {
+      doLast {
+          println 'taskX'
+      }
+  }
+  def taskY = tasks.register('taskY') {
+      doLast {
+          println 'taskY'
+      }
+  }
+  taskY.configure {
+      mustRunAfter taskX
+  }
+  ```
+
+  ```shell
+  ./gradlew -q taskY taskX
+  ```
+
+- *添加“shouldRunAfter ”任务排序*
+
+  ```groovy
+  def taskX = tasks.register('taskX') {
+      doLast {
+          println 'taskX'
+      }
+      
+  }
+  def taskY = tasks.register('taskY') {
+      doLast {
+          println 'taskY'
+      }
+  }
+  taskY.configure {
+      shouldRunAfter taskX
+  }
+  //gradle -q taskY taskX 
+  ```
+
+- *如果“shouldRunAfter ”任务排序引入了排序周期，则忽略它*
+
+  ```groovy
+  def taskX = tasks.register('taskX') {
+      doLast {
+          println 'taskX'
+      }
+  }
+  def taskY = tasks.register('taskY') {
+      doLast {
+          println 'taskY'
+      }
+  }
+  def taskZ = tasks.register('taskZ') {
+      doLast {
+          println 'taskZ'
+      }
+  }
+  taskX.configure { dependsOn(taskY) }
+  taskY.configure { dependsOn(taskZ) }
+  taskZ.configure { shouldRunAfter(taskX) }
+  
+  //gradle -q taskX 
+  ```
 
 ### [跳过任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:skipping_tasks)
 
@@ -283,6 +454,8 @@ tasks.addRule("Pattern: ping<ID>") { String taskName ->
         }
     }
 }
+
+//gradle -q pingServer1
 ```
 
 #### [终结器任务](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:finalizer_tasks)
@@ -303,6 +476,24 @@ def taskY = tasks.register('taskY') {
 
 taskX.configure { finalizedBy taskY }
 ```
+
+```groovy
+def taskX = tasks.register('taskX') {
+    doLast {
+        println 'taskX'
+        throw new RuntimeException()
+    }
+}
+def taskY = tasks.register('taskY') {
+    doLast {
+        println 'taskY'
+    }
+}
+
+taskX.configure { finalizedBy taskY }
+```
+
+
 
 ## 开发自定义 Gradle 任务类型
 
