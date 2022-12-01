@@ -2,3 +2,13 @@
 
 - 该处理器添加到beanFactory中的，发生在refresh的prepareBeanFactory阶段；
 - 该处理器往实现了EnvironmentAware、EmbeddedValueResolverAware、ResourceLoaderAware、ApplicationEventPublisherAware、MessageSourceAware、ApplicationStartupAware、ApplicationContextAware这些接口的bean对象中设置ConfigurableEnvironment、StringValueResolver、ResourceLoader、ApplicationEventPublisher、MessageSource、ApplicationStartup、ApplicationContext；
+
+## ConfigurationClassPostProcessor—bean工厂后处理器
+
+
+
+
+
+## AutoConfigurationImportSelector.AutoConfigurationGroup
+
+会在ConfigurationClassPostProcessor中执行加载META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports文件中的配置类
