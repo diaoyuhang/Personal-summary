@@ -78,7 +78,81 @@ tmpfs            1954400        0   1954400   0% /dev/shm
   因为$$优先级高于管道，$BASHPID优先级低于管道；
   ```
   
-  
+
+# 命令
+
+1. stat 文件名
+
+   查看文件的原数据信息；
+
+2. lsof -op 进程号
+
+   查看该进程打开的文件；-o作用查看fd指针偏移量；
+
+   ```shell
+   -- 用一个文件描述符来读取文件anaconda-ks.cfg
+   exec 4< anaconda-ks.cfg
+   
+   -- 执行lsof -op $$,能查看到当前进程中打开了一个文件描述符4指向文件anaconda-ks.cfg
+   --读取内容到变量a中
+   read a 0<& 4
+   ```
+
+3. strace -ff -o filename  执行命令
+
+   -f 跟踪所有的产生的子进程 ，-ff 加上 -o 则是将所有跟踪结果输出到filename.pid文件中；
+
+4. ps命令是Process Status的缩写，用来列出系统运行的进程；
+
+   ```shell
+   ps -a  显示所有终端下执行的进程，包含其他用户的进程
+   ps -A  显示所有进程
+   ps -e  和-A功能一样
+   ps -H  显示树状结构，表示程序间的相互关系
+   ps -f  全格式显示进程
+   
+   ps a   显示当前终端下执行的进程
+   ps c   显示进程的真实名称
+   ps e   列出程序所使用的环境变量
+   ps f   用ASCII字符显示树状结构，表达程序间的相互关系
+   ps x   显示所有进程，无论是否运行在终端上
+   ps u   显示用户相关的进程或者与用户相关的属性
+   ps r   只显示正在运行的进程
+   
+   ps -aux 看当前时间点那个进程占用的资源
+   ps -ef 使用标准语法查看系统上的每个进程
+   ```
+
+5. pcstat 文件名
+
+   查看当前文件在内核中缓存了多少页；
+
+6. sysctl -a
+
+   显示内核中的很多控制项；
+
+   ```shell
+   sysctl -a |grep dirty
+   ##找到配置项
+   vm.dirty_background_ratio = 0 ##当内存达到百分之多少后，由内存将脏页写入到磁盘
+   vm.dirty_ratio = 0 ##当内存占用到这个百分比后，会阻塞程序禁止写入
+   vm.dirty_writeback_centisecs = 500 ## 该时间表示每5秒将脏页自主写入磁盘
+   vm.dirty_expire_centisecs = 3000 ##脏页的生命周期时间
+   
+   vim /etc/sysctl.conf ##添加上述配置项
+   
+   sysctl -p ##执行加载上述配置
+   ```
+
+7. route -n
+
+   查看路由表
+
+   route add -host 目标地址 gw 网关地址
+
+   添加路由条目
+
+
 
 # 内存
 
