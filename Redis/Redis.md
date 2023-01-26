@@ -72,7 +72,7 @@
 
 ## Object获取key对应值的类型
 
-> key中包含encoding
+> key中包含	
 
 ![](images\object检查redis对象.png)
 
