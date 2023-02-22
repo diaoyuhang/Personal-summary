@@ -6,37 +6,37 @@
 
 #### 1、加载全局配置文件
 
-![](\images\mybatis加载config配置文件信息.png)
+![](images\mybatis加载config配置文件信息.png)
 
 #### 2、解析得到Configuration配置对象，包含全局配置和xxxMapper.xml配置信息
 
-![](\images\返回加载完的mybatis配置的configuration.png)
+![](images\返回加载完的mybatis配置的configuration.png)
 
-![](\images\解析出Mapper文件的位置.png)
+![](images\解析出Mapper文件的位置.png)
 
 #### 3、一个MappedStatement代表了一个增删改查的详细信息
 
-![](\images\Configuration中保存的Mapper内容.png)
+![](images\Configuration中保存的Mapper内容.png)
 
-![](\images\MyBatis中SqlSessionFactory初始化时序图.png)
+![](images\MyBatis中SqlSessionFactory初始化时序图.png)
 
 ## 二、获取sqlSession对象
 
-![](\images\mybatis获取sqlSession时序图.png)
+![](images\mybatis获取sqlSession时序图.png)
 
 ## 三、获取接口的代理对象
 
-![](\images\mybatis获取接口的代理对象时序图.png)
+![](images\mybatis获取接口的代理对象时序图.png)
 
 代理对象中包含了DefaultSqlSession对象
 
-![](\images\Mapper接口代理对象中包含了sqlSession对象.png)
+![](images\Mapper接口代理对象中包含了sqlSession对象.png)
 
 
 
 ## 四、执行增删改查方法
 
-![](\images\mybatis执行sql时序图.png)
+![](images\mybatis执行sql时序图.png)
 
 
 
@@ -44,7 +44,7 @@
 > ResultHandler：处理结果集
 > TypeHandler：在整个过程中，进行数据库类型和javaBean类型的映射
 
-![](\images\查询流程总结.png)
+![](images\查询流程总结.png)
 
 ## 五、流程总结
 
